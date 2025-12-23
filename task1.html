@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .calculator {
+            background: #22252d;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            padding: 25px;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .display {
+            background: #1a1d24;
+            border-radius: 15px;
+            padding: 30px 20px;
+            margin-bottom: 20px;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .previous-operand {
+            color: #858694;
+            font-size: 20px;
+            min-height: 25px;
+            word-wrap: break-word;
+            word-break: break-all;
+            text-align: right;
+        }
+
+        .current-operand {
+            color: #ffffff;
+            font-size: 40px;
+            font-weight: 300;
+            min-height: 50px;
+            word-wrap: break-word;
+            word-break: break-all;
+            text-align: right;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        button {
+            border: none;
+            border-radius: 12px;
+            font-size: 24px;
+            padding: 25px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        button:hover {
+            transform: scale(1.05);
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        .number {
+            background: #2d3038;
+            color: #ffffff;
+        }
+
+        .number:hover {
+            background: #363940;
+        }
+
+        .operator {
+            background: #ff6b6b;
+            color: #ffffff;
+        }
+
+        .operator:hover {
+            background: #ff5252;
+        }
+
+        .operator.active {
+            background: #ff3838;
+            box-shadow: 0 0 20px rgba(255, 107, 107, 0.6);
+        }
+
+        .equals {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            grid-column: span 2;
+        }
+
+        .equals:hover {
+            background: linear-gradient(135deg, #5568d3 0%, #6a3f94 100%);
+        }
+
+        .clear {
+            background: #f39c12;
+            color: #ffffff;
+        }
+
+        .clear:hover {
+            background: #e67e22;
+        }
+
+        .delete {
+            background: #e74c3c;
+            color: #ffffff;
+        }
+
+        .delete:hover {
+            background: #c0392b;
+        }
+
+        .zero {
+            grid-column: span 2;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .header h2 {
+            color: #ffffff;
+            font-size: 24px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 480px) {
+            .calculator {
+                padding: 20px;
+            }
+
+            button {
+                padding: 20px;
+                font-size: 20px;
+            }
+
+            .current-operand {
+                font-size: 32px;
+            }
+
+            .previous-operand {
+                font-size: 16px;
+            }
+        }
+
+        /* Animation */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .calculator {
+            animation: fadeIn 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <div class="header">
+            <h2>🔢 Calculator</h2>
+        </div>
+        
+        <div class="display">
+            <div class="previous-operand" id="previousOperand"></div>
+            <div class="current-operand" id="currentOperand">0</div>
+        </div>
+
+        <div class="buttons">
+            <button class="clear" onclick="calculator.clear()">AC</button>
+            <button class="delete" onclick="calculator.delete()">DEL</button>
+            <button class="operator" onclick="calculator.chooseOperation('/')">÷</button>
+            <button class="operator" onclick="calculator.chooseOperation('*')">×</button>
+            
+            <button class="number" onclick="calculator.appendNumber('7')">7</button>
+            <button class="number" onclick="calculator.appendNumber('8')">8</button>
+            <button class="number" onclick="calculator.appendNumber('9')">9</button>
+            <button class="operator" onclick="calculator.chooseOperation('-')">−</button>
+            
+            <button class="number" onclick="calculator.appendNumber('4')">4</button>
+            <button class="number" onclick="calculator.appendNumber('5')">5</button>
+            <button class="number" onclick="calculator.appendNumber('6')">6</button>
+            <button class="operator" onclick="calculator.chooseOperation('+')">+</button>
+            
+            <button class="number" onclick="calculator.appendNumber('1')">1</button>
+            <button class="number" onclick="calculator.appendNumber('2')">2</button>
+            <button class="number" onclick="calculator.appendNumber('3')">3</button>
+            <button class="operator" onclick="calculator.chooseOperation('%')">%</button>
+            
+            <button class="number zero" onclick="calculator.appendNumber('0')">0</button>
+            <button class="number" onclick="calculator.appendNumber('.')">.</button>
+            <button class="equals" onclick="calculator.compute()">=</button>
+        </div>
+    </div>
+
+    <script>
+        class Calculator {
+            constructor(previousOperandElement, currentOperandElement) {
+                this.previousOperandElement = previousOperandElement;
+                this.currentOperandElement = currentOperandElement;
+                this.clear();
+            }
+
+            clear() {
+                this.currentOperand = '0';
+                this.previousOperand = '';
+                this.operation = undefined;
+                this.updateDisplay();
+            }
+
+            delete() {
+                if (this.currentOperand === '0') return;
+                
+                if (this.currentOperand.length === 1) {
+                    this.currentOperand = '0';
+                } else {
+                    this.currentOperand = this.currentOperand.slice(0, -1);
+                }
+                
+                this.updateDisplay();
+            }
+
+            appendNumber(number) {
+                // Prevent multiple decimal points
+                if (number === '.' && this.currentOperand.includes('.')) return;
+                
+                // Replace initial zero with number (except for decimals)
+                if (this.currentOperand === '0' && number !== '.') {
+                    this.currentOperand = number;
+                } else {
+                    this.currentOperand += number;
+                }
+                
+                this.updateDisplay();
+            }
+
+            chooseOperation(operation) {
+                // If there's no current operand, don't do anything
+                if (this.currentOperand === '') return;
+                
+                // If there's already a previous operand, compute first
+                if (this.previousOperand !== '') {
+                    this.compute();
+                }
+                
+                this.operation = operation;
+                this.previousOperand = this.currentOperand;
+                this.currentOperand = '0';
+                this.updateDisplay();
+                
+                // Visual feedback for operator
+                this.highlightOperator(operation);
+            }
+
+            compute() {
+                let computation;
+                const prev = parseFloat(this.previousOperand);
+                const current = parseFloat(this.currentOperand);
+                
+                // If either operand is not a number, don't compute
+                if (isNaN(prev) || isNaN(current)) return;
+                
+                // Perform calculation based on operation
+                switch (this.operation) {
+                    case '+':
+                        computation = prev + current;
+                        break;
+                    case '-':
+                        computation = prev - current;
+                        break;
+                    case '*':
+                        computation = prev * current;
+                        break;
+                    case '/':
+                        if (current === 0) {
+                            alert('Cannot divide by zero!');
+                            this.clear();
+                            return;
+                        }
+                        computation = prev / current;
+                        break;
+                    case '%':
+                        computation = prev % current;
+                        break;
+                    default:
+                        return;
+                }
+                
+                // Round to avoid floating point errors
+                computation = Math.round(computation * 100000000) / 100000000;
+                
+                this.currentOperand = computation.toString();
+                this.operation = undefined;
+                this.previousOperand = '';
+                this.updateDisplay();
+            }
+
+            getDisplayNumber(number) {
+                const stringNumber = number.toString();
+                const integerDigits = parseFloat(stringNumber.split('.')[0]);
+                const decimalDigits = stringNumber.split('.')[1];
+                let integerDisplay;
+                
+                if (isNaN(integerDigits)) {
+                    integerDisplay = '';
+                } else {
+                    integerDisplay = integerDigits.toLocaleString('en', {
+                        maximumFractionDigits: 0
+                    });
+                }
+                
+                if (decimalDigits != null) {
+                    return `${integerDisplay}.${decimalDigits}`;
+                } else {
+                    return integerDisplay;
+                }
+            }
+
+            updateDisplay() {
+                this.currentOperandElement.textContent = this.getDisplayNumber(this.currentOperand);
+                
+                if (this.operation != null) {
+                    const operationSymbol = this.getOperationSymbol(this.operation);
+                    this.previousOperandElement.textContent = 
+                        `${this.getDisplayNumber(this.previousOperand)} ${operationSymbol}`;
+                } else {
+                    this.previousOperandElement.textContent = '';
+                }
+            }
+
+            getOperationSymbol(operation) {
+                const symbols = {
+                    '+': '+',
+                    '-': '−',
+                    '*': '×',
+                    '/': '÷',
+                    '%': '%'
+                };
+                return symbols[operation] || operation;
+            }
+
+            highlightOperator(operation) {
+                // Remove active class from all operators
+                document.querySelectorAll('.operator').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                // Add active class to current operator
+                const operatorButtons = document.querySelectorAll('.operator');
+                operatorButtons.forEach(btn => {
+                    const btnText = btn.textContent;
+                    const symbol = this.getOperationSymbol(operation);
+                    if (btnText === symbol) {
+                        btn.classList.add('active');
+                    }
+                });
+            }
+        }
+
+        // Initialize calculator
+        const previousOperandElement = document.getElementById('previousOperand');
+        const currentOperandElement = document.getElementById('currentOperand');
+        const calculator = new Calculator(previousOperandElement, currentOperandElement);
+
+        // Keyboard support
+        document.addEventListener('keydown', function(event) {
+            const key = event.key;
+            
+            // Numbers and decimal
+            if ((key >= '0' && key <= '9') || key === '.') {
+                calculator.appendNumber(key);
+            }
+            
+            // Operations
+            if (key === '+' || key === '-' || key === '*' || key === '/' || key === '%') {
+                calculator.chooseOperation(key);
+            }
+            
+            // Enter or equals
+            if (key === 'Enter' || key === '=') {
+                event.preventDefault();
+                calculator.compute();
+            }
+            
+            // Backspace
+            if (key === 'Backspace') {
+                event.preventDefault();
+                calculator.delete();
+            }
+            
+            // Escape or clear
+            if (key === 'Escape' || key.toLowerCase() === 'c') {
+                calculator.clear();
+            }
+        });
+    </script>
+</body>
+</html>
